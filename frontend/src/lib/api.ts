@@ -75,3 +75,31 @@ export async function uploadAvatar(token: string, file: File) {
     if (!res.ok) throw new Error('Failed to upload avatar');
     return res.json();
 }
+
+export async function getComments(postId: number) {
+    const res = await fetch(`${API_URL}/api/posts/${postId}/comments`);
+    if (!res.ok) throw new Error('Failed to fetch comments');
+    return res.json();
+}
+
+export async function addComment(token: string, postId: number, content: string) {
+    const res = await fetch(`${API_URL}/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ content }),
+    });
+    if (!res.ok) throw new Error('Failed to add comment');
+    return res.json();
+}
+
+export async function toggleLike(token: string, postId: number) {
+    const res = await fetch(`${API_URL}/api/posts/${postId}/likes`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error('Failed to toggle like');
+    return res.json();
+}

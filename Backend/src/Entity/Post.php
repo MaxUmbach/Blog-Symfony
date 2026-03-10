@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\PostRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 class Post
@@ -27,6 +29,22 @@ class Post
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
+    
+    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post', orphanRemoval: true)]
+    private Collection $comments;
+
+    #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'post', orphanRemoval: true)]
+    private Collection $likes;
+    
+    
+    
+      public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+        $this->likes = new ArrayCollection();
+    }
+    
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -79,4 +97,10 @@ class Post
 
         return $this;
     }
+
+
+
+    public function getComments(): Collection { return $this->comments; }
+    public function getLikes(): Collection { return $this->likes; }
+    public function getLikeCount(): int { return $this->likes->count(); }
 }
