@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mein Blog{% endblock %}
+
+{% block body %}
+<style>
+    .blog-container { margin: 2em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .blog-post { border-bottom: 1px solid #ccc; padding: 1em 0; }
+    .blog-post h2 { margin: 0 0 0.5em; }
+    .blog-post p { margin: 0.5em 0; }
+</style>
+
+<div class="blog-container">
+    <h1>Willkommen zu meinem Blog! 📝</h1>
+
+    {% if posts is empty %}
+        <p>Keine Blog-Posts vorhanden.</p>
+    {% else %}
+        {% for post in posts %}
+            <div class="blog-post">
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.content|slice(0, 200) ~ '...' }}</p>
+                <small>Erstellt am {{ post.createdAt|date('d.m.Y H:i') }}</small>
+                <a class="read-more" href="{{ path('app_post_show', {id: post.id}) }}">Weiterlesen</a>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

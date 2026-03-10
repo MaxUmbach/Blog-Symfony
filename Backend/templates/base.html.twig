@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}My Blog{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+</head>
+<body>
+
+    {% include 'partials/navbar.html.twig' %}
+
+    <main class="content">
+        {% block body %}{% endblock %}
+    </main>
+
+</body>
+</html>
