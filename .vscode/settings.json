@@ -1,3 +1,4 @@
 {
-    "terminal.integrated.cwd": "E:\\Workspace\\Blog-Symfony\\Backend"
+    "terminal.integrated.cwd": "E:\\Workspace\\Blog-Symfony\\Backend",
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

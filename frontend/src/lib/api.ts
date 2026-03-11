@@ -103,3 +103,11 @@ export async function toggleLike(token: string, postId: number) {
     if (!res.ok) throw new Error('Failed to toggle like');
     return res.json();
 }
+
+export async function getLikeStatus(token: string, postId: number) {
+    const res = await fetch(`${API_URL}/api/posts/${postId}/likes/status`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error('Failed to fetch like status');
+    return res.json();
+}

@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import Header from '@/components/Header';
-import { getPost, getComments, addComment, toggleLike } from '@/lib/api';
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import Header from "@/components/Header";
+import {
+  getPost,
+  getComments,
+  addComment,
+  toggleLike,
+  getLikeStatus,
+} from "@/lib/api";
 
 interface Post {
   id: number;
@@ -25,21 +31,28 @@ export default function PostPage() {
   const { id } = useParams();
   const [post, setPost] = useState<Post | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newComment, setNewComment] = useState('');
+  const [newComment, setNewComment] = useState("");
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
 
     getPost(Number(id)).then(setPost);
     getComments(Number(id)).then(setComments);
+
+    if (token) {
+      getLikeStatus(token, Number(id)).then((data) => {
+        setLiked(data.liked);
+        setLikeCount(data.count);
+      });
+    }
   }, [id]);
 
   async function handleLike() {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) return;
     const data = await toggleLike(token, Number(id));
     setLiked(data.liked);
@@ -48,12 +61,12 @@ export default function PostPage() {
 
   async function handleComment(e: React.FormEvent) {
     e.preventDefault();
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token || !newComment.trim()) return;
 
     const comment = await addComment(token, Number(id), newComment);
     setComments((prev) => [...prev, comment]);
-    setNewComment('');
+    setNewComment("");
   }
 
   if (!post) return null;
@@ -63,11 +76,14 @@ export default function PostPage() {
       <Header />
 
       <article className="max-w-3xl mx-auto px-6 py-16">
-        <Link href="/posts" className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 mb-8 inline-block">
+        <Link
+          href="/posts"
+          className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 mb-8 inline-block"
+        >
           ← Zurück
         </Link>
         <p className="text-sm text-zinc-400 mb-2">
-          {post.author} · {new Date(post.createdAt).toLocaleDateString('de-DE')}
+          {post.author} · {new Date(post.createdAt).toLocaleDateString("de-DE")}
         </p>
         <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-8">
           {post.title}
@@ -84,15 +100,18 @@ export default function PostPage() {
             disabled={!isLoggedIn}
             className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-colors ${
               liked
-                ? 'bg-red-50 border-red-200 text-red-500 dark:bg-red-950 dark:border-red-800'
-                : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400'
+                ? "bg-red-50 border-red-200 text-red-500 dark:bg-red-950 dark:border-red-800"
+                : "border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-400"
             } disabled:opacity-40 disabled:cursor-not-allowed`}
           >
-            {liked ? '❤️' : '🤍'} {likeCount}
+            {liked ? "❤️" : "🤍"} {likeCount}
           </button>
           {!isLoggedIn && (
             <span className="text-sm text-zinc-400">
-              <Link href="/login" className="underline">Einloggen</Link> um zu liken
+              <Link href="/login" className="underline">
+                Einloggen
+              </Link>{" "}
+              um zu liken
             </span>
           )}
         </div>
@@ -123,7 +142,10 @@ export default function PostPage() {
 
           {!isLoggedIn && (
             <p className="text-sm text-zinc-400 mb-8">
-              <Link href="/login" className="underline">Einloggen</Link> um zu kommentieren
+              <Link href="/login" className="underline">
+                Einloggen
+              </Link>{" "}
+              um zu kommentieren
             </p>
           )}
 
@@ -132,14 +154,21 @@ export default function PostPage() {
               <p className="text-zinc-400 text-sm">Noch keine Kommentare.</p>
             )}
             {comments.map((comment) => (
-              <div key={comment.id} className="border-b border-zinc-100 dark:border-zinc-800 pb-6">
+              <div
+                key={comment.id}
+                className="border-b border-zinc-100 dark:border-zinc-800 pb-6"
+              >
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="font-medium text-sm text-zinc-900 dark:text-white">{comment.author}</span>
+                  <span className="font-medium text-sm text-zinc-900 dark:text-white">
+                    {comment.author}
+                  </span>
                   <span className="text-xs text-zinc-400">
-                    {new Date(comment.createdAt).toLocaleDateString('de-DE')}
+                    {new Date(comment.createdAt).toLocaleDateString("de-DE")}
                   </span>
                 </div>
-                <p className="text-zinc-600 dark:text-zinc-400 text-sm">{comment.content}</p>
+                <p className="text-zinc-600 dark:text-zinc-400 text-sm">
+                  {comment.content}
+                </p>
               </div>
             ))}
           </div>
