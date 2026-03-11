@@ -14,6 +14,25 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/posts')]
 final class PostController extends AbstractController
 {
+
+    #[Route('/search', name: 'api_post_search', methods: ['GET'])]
+    public function search(Request $request, PostRepository $postRepository): JsonResponse
+    {
+        $q = $request->query->get('q', '');
+
+        if (strlen($q) < 2) {
+            return $this->json([]);
+        }
+
+        $posts = $postRepository->search($q);
+
+        $data = array_map(fn(Post $post) => $this->serializePost($post), $posts);
+
+        return $this->json($data);
+    }
+
+
+
     #[Route('', name: 'api_post_index', methods: ['GET'])]
     public function index(PostRepository $postRepository): JsonResponse
     {
